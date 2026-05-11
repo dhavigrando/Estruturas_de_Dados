@@ -1,0 +1,34 @@
+Objetivo: Desenvolver um programa para 'simular' o potencial de atendimento a torcedores de um
+estádio, utilizando uma fila para cada guichê de atendimento:
+Descrição:
+Desenvolva uma biblioteca para fila que contenha as seguintes funções:
+• inicializa fila
+• entrar_na_fila: insere elemento no final
+• atender: remove elemento do início
+• primeiro: retorna primeiro elemento
+Como entrada, o programa deverá solicitar ao usuário:
+• qtd. de guichês sócio-torcedor;
+• qtd. de guichês normal;
+• qtd de pessoas que estão aguardando antes do início da simulação (carga inicial);
+• qtd de pessoas que procuram os guichês a cada unidade de tempo; e
+• qtd de tempo em que o modelo será 'simulado'.
+* Qualquer quantidade pode ser zerada
+Ao entrar em uma fila, os clientes sempre avaliam qual delas é a menor, para serem atendidos em menor
+tempo (as filas devem ser demonstradas o tempo todo durante a execução, com as quantidades de
+torcedores, seu tipo (normal/sócio) e unidades de tempo de cada um). Cada unidade de tempo, durante a
+simulação, deve ser passada com o comando “enter” e a cada unidade de tempo os detalhes de cada fila
+devem ser atualizados.
+Frequência na procura por guichês:
+• 5% das pessoas procuram guichês sócio-torcedor;
+• 95% das pessoas procuram guichês normal.
+Quantidade de tempo de atendimento aos sócio-torcedores:
+• 85% são atendidas em 1 unidade de tempo;
+• 15% são atendidas em 2 unidades de tempo.
+Universidade do Vale do Itajaí
+Escola Politécnica
+Engenharia de Computação
+Estruturas de Dados
+Quantidade de tempo de atendimento aos torcedores normais:
+• 25% são atendidas em 1 unidades de tempo;
+• 30% são atendidas em 2 unidades de tempo;
+• 45% são atendidas em 3 unidades de tempo.
