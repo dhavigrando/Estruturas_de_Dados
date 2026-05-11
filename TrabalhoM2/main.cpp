@@ -13,7 +13,7 @@ int main() {
 
     int qtd_socios, qtd_normais, carga_inicial, qtd_por_tempo, tempo_simulacao;
 
-    cout << " Simulacao de Atendimento no Estadio \n\n";
+    cout << "Simulacao de Atendimento no Estadio \n\n";
     cout << "Quantidade de guiches socio-torcedor: ";
     cin >> qtd_socios;
     cout << "Quantidade de guiches normal: ";

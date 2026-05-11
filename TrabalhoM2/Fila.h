@@ -1,6 +1,3 @@
-/* Estruturas de Dados (23272) - Trabalho M2
-   Integrantes: Dhavi Grando, Felipe Scremin, Matheus Menozzo */
-
 #ifndef FILA_H_INCLUDED
 #define FILA_H_INCLUDED
 #include <stdexcept>
