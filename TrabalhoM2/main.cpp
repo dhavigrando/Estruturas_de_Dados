@@ -2,15 +2,11 @@
    Integrantes: Dhavi Grando, Felipe Scremin, Matheus Menozzo */
 
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
 #include "Fila.h"
 #include "TAD_Fila.h"
 using namespace std;
 
 int main() {
-    srand(time(NULL)); // inicializa o gerador de numeros aleatorios com a hora atual
-
     int qtd_socios, qtd_normais, carga_inicial, qtd_por_tempo, tempo_simulacao;
 
     cout << "Simulacao de Atendimento no Estadio \n\n";
@@ -28,8 +24,19 @@ int main() {
 
     // aloca os arrays de guiches dinamicamente de acordo com as quantidades informadas
     // se a quantidade for zero, nao aloca (NULL indica que esse tipo nao existe)
-    Guiche* guiches_socios  = (qtd_socios  > 0) ? new Guiche[qtd_socios]  : NULL;
-    Guiche* guiches_normais = (qtd_normais > 0) ? new Guiche[qtd_normais] : NULL;
+    Guiche* guiches_socios;
+    if (qtd_socios > 0) {
+        guiches_socios = new Guiche[qtd_socios];
+    } else {
+        guiches_socios = NULL;
+    }
+
+    Guiche* guiches_normais;
+    if (qtd_normais > 0) {
+        guiches_normais = new Guiche[qtd_normais];
+    } else {
+        guiches_normais = NULL;
+    }
 
     // inicializa cada guiche socio com fila vazia e sem ninguem em atendimento
     for (int i = 0; i < qtd_socios; i++) {
@@ -44,9 +51,12 @@ int main() {
         guiches_normais[i].tempo_atendimento_restante = 0;
     }
 
+    // contadores para controlar a distribuicao de tipos e tempos de atendimento
+    int contador_pessoas = 0, contador_socios = 0, contador_normais = 0;
+
     // insere a carga inicial de pessoas nas filas antes de comecar a simulacao
     for (int i = 0; i < carga_inicial; i++) {
-        Pessoa p = nova_pessoa();
+        Pessoa p = nova_pessoa(contador_pessoas, contador_socios, contador_normais);
         inserir_pessoa(p, guiches_socios, qtd_socios, guiches_normais, qtd_normais);
     }
 
@@ -65,15 +75,17 @@ int main() {
 
         // 2. novas pessoas chegam e entram na menor fila disponivel do seu tipo
         for (int i = 0; i < qtd_por_tempo; i++) {
-            Pessoa p = nova_pessoa();
+            Pessoa p = nova_pessoa(contador_pessoas, contador_socios, contador_normais);
             inserir_pessoa(p, guiches_socios, qtd_socios, guiches_normais, qtd_normais);
         }
 
         // 3. exibe o estado de todas as filas e acumula dados para a media final
-        if (qtd_socios > 0)
-            exibir_filas(guiches_socios,  qtd_socios,  "socio-torcedor", soma_socios,  contagem_socios);
-        if (qtd_normais > 0)
-            exibir_filas(guiches_normais, qtd_normais, "normal",         soma_normais, contagem_normais);
+        if (qtd_socios > 0) {
+            exibir_filas(guiches_socios, qtd_socios, "socio-torcedor", soma_socios, contagem_socios);
+        }
+        if (qtd_normais > 0) {
+            exibir_filas(guiches_normais, qtd_normais, "normal", soma_normais, contagem_normais);
+        }
 
         // aguarda o usuario pressionar Enter para avancar para a proxima unidade de tempo
         cout << "Pressione Enter para continuar...";
@@ -93,7 +105,15 @@ int main() {
         cout << "\n";
     }
 
-    // libera toda a memoria alocada dinamicamente antes de encerrar
+    // libera as pessoas que ainda estavam aguardando em cada fila ao final da simulacao
+    for (int i = 0; i < qtd_socios; i++) {
+        libera_fila(guiches_socios[i].fila);
+    }
+    for (int i = 0; i < qtd_normais; i++) {
+        libera_fila(guiches_normais[i].fila);
+    }
+
+    // libera toda a memoria dos arrays de guiches antes de encerrar
     delete[] guiches_socios;
     delete[] guiches_normais;
 

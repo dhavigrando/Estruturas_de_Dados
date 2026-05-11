@@ -1,7 +1,6 @@
 #ifndef TAD_FILA_H_INCLUDED
 #define TAD_FILA_H_INCLUDED
 #include <iostream>
-#include <cstdlib>
 #include "Fila.h"
 using namespace std;
 
@@ -34,27 +33,33 @@ int menor_fila(Guiche* guiches, int qtd) {
     return indice_menor;
 }
 
-// gera uma nova pessoa com tipo (socio/normal) e tempo de atendimento aleatorios
-// seguindo as probabilidades definidas no enunciado
-Pessoa nova_pessoa() {
+// gera uma nova pessoa com tipo (socio/normal) e tempo de atendimento
+// usando contadores ciclicos passados por referencia para respeitar as proporcoes do enunciado:
+// a cada 20 pessoas: 1 e socio (5%) e 19 sao normais (95%)
+Pessoa nova_pessoa(int& contador_pessoas, int& contador_socios, int& contador_normais) {
+    contador_pessoas++;
+
     Pessoa p;
-    int tipo = rand() % 100;
-    p.eh_socio = (tipo < 5); // 5% de chance de ser socio-torcedor
+
+    // a cada 20 pessoas, a de numero 20 e socio (5%), as demais sao normais (95%)
+    p.eh_socio = (contador_pessoas % 20 == 0);
 
     if (p.eh_socio) {
-        // socio: 85% leva 1 unidade de tempo, 15% leva 2
-        int t = rand() % 100;
-        if (t < 85) {
+        contador_socios++; // incrementa o contador de socios
+        // a cada 20 socios: os 17 primeiros levam 1 unidade (85%), os 3 seguintes levam 2 (15%)
+        int ciclo = contador_socios % 20; // valor de 0 a 19
+        if (ciclo < 17) {
             p.tempo_atendimento = 1;
         } else {
             p.tempo_atendimento = 2;
         }
     } else {
-        // normal: 25% leva 1, 30% leva 2, 45% leva 3 unidades de tempo
-        int t = rand() % 100;
-        if (t < 25) {
+        contador_normais++; // incrementa o contador de normais
+        // a cada 20 normais: 5 levam 1 unidade (25%), 6 levam 2 (30%), 9 levam 3 (45%)
+        int ciclo = contador_normais % 20; // valor de 0 a 19
+        if (ciclo < 5) {
             p.tempo_atendimento = 1;
-        } else if (t < 55) {
+        } else if (ciclo < 11) {
             p.tempo_atendimento = 2;
         } else {
             p.tempo_atendimento = 3;
@@ -72,19 +77,19 @@ void inserir_pessoa(Pessoa p,
     if (p.eh_socio) {
         if (qtd_socios > 0) {
             // entra na fila do guiche socio com menor espera
-            queue(guiches_socios[menor_fila(guiches_socios, qtd_socios)].fila, p);
+            entrar_na_fila(guiches_socios[menor_fila(guiches_socios, qtd_socios)].fila, p);
         } else if (qtd_normais > 0) {
             // nao ha guiche socio, entao vai para o normal
-            queue(guiches_normais[menor_fila(guiches_normais, qtd_normais)].fila, p);
+            entrar_na_fila(guiches_normais[menor_fila(guiches_normais, qtd_normais)].fila, p);
         }
         // se nao ha nenhum guiche disponivel, a pessoa nao e inserida
     } else {
         if (qtd_normais > 0) {
             // entra na fila do guiche normal com menor espera
-            queue(guiches_normais[menor_fila(guiches_normais, qtd_normais)].fila, p);
+            entrar_na_fila(guiches_normais[menor_fila(guiches_normais, qtd_normais)].fila, p);
         } else if (qtd_socios > 0) {
             // nao ha guiche normal, entao vai para o socio
-            queue(guiches_socios[menor_fila(guiches_socios, qtd_socios)].fila, p);
+            entrar_na_fila(guiches_socios[menor_fila(guiches_socios, qtd_socios)].fila, p);
         }
     }
 }
@@ -101,7 +106,7 @@ void processar_atendimento(Guiche* guiches, int qtd) {
         }
         // se o guiche ficou livre e ainda tem gente na fila, chama o proximo
         if (!guiches[j].ocupado && !fila_vazia(guiches[j].fila)) {
-            guiches[j].pessoa_em_atendimento = dequeue(guiches[j].fila); // remove da fila
+            guiches[j].pessoa_em_atendimento = atender(guiches[j].fila); // remove da fila
             guiches[j].tempo_atendimento_restante = guiches[j].pessoa_em_atendimento.tempo_atendimento;
             guiches[j].ocupado = true;
         }
@@ -118,8 +123,13 @@ void exibir_filas(Guiche* guiches, int qtd, const char* label, double& soma, int
 
         // mostra quem esta sendo atendido agora e quanto tempo falta
         if (guiches[j].ocupado) {
-            cout << "[EM ATENDIMENTO: "
-                 << (guiches[j].pessoa_em_atendimento.eh_socio ? "socio" : "normal")
+            const char* tipo_atendimento;
+            if (guiches[j].pessoa_em_atendimento.eh_socio) {
+                tipo_atendimento = "socio";
+            } else {
+                tipo_atendimento = "normal";
+            }
+            cout << "[EM ATENDIMENTO: " << tipo_atendimento
                  << ", " << guiches[j].tempo_atendimento_restante << "t restante] ";
         } else {
             cout << "[livre] "; // guiche nao esta atendendo ninguem
@@ -128,9 +138,13 @@ void exibir_filas(Guiche* guiches, int qtd, const char* label, double& soma, int
         // percorre a fila e mostra cada pessoa que esta esperando
         TItem<Pessoa>* aux = guiches[j].fila.primeiro;
         while (aux != NULL) {
-            cout << "["
-                 << (aux->dado.eh_socio ? "socio" : "normal")
-                 << ", " << aux->dado.tempo_atendimento << "t] ";
+            const char* tipo_espera;
+            if (aux->dado.eh_socio) {
+                tipo_espera = "socio";
+            } else {
+                tipo_espera = "normal";
+            }
+            cout << "[" << tipo_espera << ", " << aux->dado.tempo_atendimento << "t] ";
             aux = aux->proximo;
         }
         cout << "\n";
