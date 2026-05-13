@@ -22,10 +22,10 @@ struct Guiche {
 // assim a proxima pessoa sempre entra no guiche mais rapido
 int menor_fila(Guiche* guiches, int qtd) {
     int indice_menor = 0;
-    int menor = tamanho_fila(guiches[0].fila); // comeca assumindo que o primeiro e o menor
+    int menor = tamanho_fila(guiches[0].fila) + guiches[0].tempo_atendimento_restante;
     for (int j = 1; j < qtd; j++) {
-        int tam = tamanho_fila(guiches[j].fila);
-        if (tam < menor) { // encontrou fila menor, atualiza o indice
+        int tam = tamanho_fila(guiches[j].fila) + guiches[j].tempo_atendimento_restante;
+        if (tam < menor) {
             menor = tam;
             indice_menor = j;
         }

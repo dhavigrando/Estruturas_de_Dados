@@ -66,7 +66,7 @@ int main() {
 
     // loop principal da simulacao: executa uma unidade de tempo por iteracao
     for (int tempo = 1; tempo <= tempo_simulacao; tempo++) {
-        cout << "\n Unidade de tempo: " << tempo << " ---\n";
+        cout << "\n Unidade de tempo: " << tempo << endl;
 
         // 1. processa o atendimento: avanca o tempo de quem esta sendo atendido
         //    e libera o guiche quando o atendimento termina
